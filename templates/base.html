@@ -1,0 +1,317 @@
+{% load static %}
+{% load tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}CardAdvisor{% endblock %}</title>
+
+  <!-- Fonts: Instrument Serif for display, Geist for body -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  {% tailwind_css %}
+
+  <style>
+    :root {
+      --forest:   #0c2218;
+      --forest-2: #112b1f;
+      --forest-3: #183827;
+      --lime:     #c8f135;
+      --lime-dim: rgba(200,241,53,0.12);
+      --lime-border: rgba(200,241,53,0.2);
+      --text-muted: rgba(255,255,255,0.45);
+      --text-dim:   rgba(255,255,255,0.7);
+      --card-border: rgba(255,255,255,0.07);
+      --card-bg:     rgba(255,255,255,0.035);
+    }
+
+    * { box-sizing: border-box; }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      font-family: 'Geist', sans-serif;
+      background: var(--forest);
+      color: #fff;
+      min-height: 100vh;
+    }
+
+    /* ─── NAVBAR ──────────────────────────────── */
+    .site-nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 50;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      padding: 0 6%;
+      background: rgba(12,34,24,0.8);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    .nav-inner {
+      width: 100%;
+      max-width: 1160px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav-logo {
+      font-family: 'Geist', sans-serif;
+      font-weight: 600;
+      font-size: 0.95rem;
+      letter-spacing: -0.01em;
+      color: #fff;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .nav-logo-mark {
+      width: 26px;
+      height: 26px;
+      background: var(--lime);
+      border-radius: 5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* credit card icon via CSS */
+    .nav-logo-mark svg {
+      width: 14px;
+      height: 14px;
+      fill: var(--forest);
+    }
+
+    .nav-links-desktop {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      list-style: none;
+      margin: 0; padding: 0;
+    }
+
+    .nav-links-desktop a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.82rem;
+      font-weight: 400;
+      letter-spacing: 0.01em;
+      transition: color 0.18s;
+    }
+
+    .nav-links-desktop a:hover { color: #fff; }
+
+    .nav-cta {
+      background: var(--lime);
+      color: var(--forest);
+      font-family: 'Geist', sans-serif;
+      font-weight: 600;
+      font-size: 0.78rem;
+      letter-spacing: 0.02em;
+      padding: 7px 16px;
+      border-radius: 5px;
+      text-decoration: none;
+      transition: background 0.18s, transform 0.12s;
+    }
+
+    .nav-cta:hover {
+      background: #d8ff45;
+      transform: translateY(-1px);
+    }
+
+    /* hamburger */
+    .hamburger-btn {
+      display: none;
+      flex-direction: column;
+      gap: 4px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+    }
+
+    .hamburger-btn span {
+      display: block;
+      width: 20px;
+      height: 1.5px;
+      background: #fff;
+      border-radius: 1px;
+      transition: all 0.25s;
+    }
+
+    .hamburger-btn.open span:nth-child(1) { transform: translateY(5.5px) rotate(45deg); }
+    .hamburger-btn.open span:nth-child(2) { opacity: 0; }
+    .hamburger-btn.open span:nth-child(3) { transform: translateY(-5.5px) rotate(-45deg); }
+
+    /* mobile menu */
+    .mobile-menu {
+      display: none;
+      position: fixed;
+      top: 56px; left: 0; right: 0;
+      background: var(--forest-2);
+      border-bottom: 1px solid var(--card-border);
+      padding: 18px 6% 24px;
+      flex-direction: column;
+      gap: 0;
+      z-index: 49;
+    }
+
+    .mobile-menu.open { display: flex; }
+
+    .mobile-menu a {
+      color: var(--text-dim);
+      text-decoration: none;
+      font-size: 0.95rem;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--card-border);
+      transition: color 0.15s;
+    }
+
+    .mobile-menu a:last-child { border-bottom: none; }
+
+    .mobile-menu a:hover { color: #fff; }
+
+    .mobile-menu .nav-cta {
+      margin-top: 14px;
+      display: block;
+      text-align: center;
+      padding: 13px;
+      border-radius: 7px;
+      font-size: 0.9rem;
+    }
+
+    /* ─── UTILITIES ───────────────────────────── */
+    .container-lg {
+      max-width: 1160px;
+      margin: 0 auto;
+      padding: 0 6%;
+    }
+
+    /* fade-up for scroll animations */
+    [data-fade] {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.65s ease, transform 0.65s ease;
+    }
+
+    [data-fade].visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* stagger delays */
+    [data-delay="1"] { transition-delay: 0.08s; }
+    [data-delay="2"] { transition-delay: 0.16s; }
+    [data-delay="3"] { transition-delay: 0.24s; }
+    [data-delay="4"] { transition-delay: 0.32s; }
+    [data-delay="5"] { transition-delay: 0.40s; }
+
+    @media (max-width: 900px) {
+      .nav-links-desktop, .nav-cta { display: none; }
+      .hamburger-btn { display: flex; }
+    }
+  </style>
+
+  {% block extra_head %}{% endblock %}
+</head>
+<body>
+
+  <!-- ─── NAVBAR ─────────────────────────────── -->
+  <nav class="site-nav" role="navigation" aria-label="Main navigation">
+    <div class="nav-inner">
+
+      <a href="{% url 'index' %}" class="nav-logo">
+        <div class="nav-logo-mark">
+          <!-- credit card icon -->
+          <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path d="M20 4H4c-1.11 0-2 .89-2 2v12c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V6c0-1.11-.89-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/>
+          </svg>
+        </div>
+        CardAdvisor
+      </a>
+
+      <ul class="nav-links-desktop">
+        <li><a href="#how-it-works">How it works</a></li>
+        <li><a href="#features">Features</a></li>
+        <li><a href="#">About</a></li>
+      </ul>
+
+      <a href="#" class="nav-cta">Start Analysis</a>
+
+      <button class="hamburger-btn" id="hamburgerBtn" aria-label="Toggle menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+
+    </div>
+  </nav>
+
+  <!-- Mobile menu -->
+  <div class="mobile-menu" id="mobileMenu" role="menu">
+    <a href="#how-it-works" role="menuitem">How it works</a>
+    <a href="#features" role="menuitem">Features</a>
+    <a href="#" role="menuitem">About</a>
+    <a href="#" class="nav-cta" role="menuitem">Start Analysis</a>
+  </div>
+
+  <!-- ─── PAGE CONTENT ──────────────────────── -->
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <!-- ─── FOOTER ────────────────────────────── -->
+  <footer style="border-top: 1px solid var(--card-border); padding: 28px 6%; margin-top: 0;">
+    <div style="max-width: 1160px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px;">
+      <span style="font-size: 0.8rem; font-weight: 600; color: var(--text-dim);">CardAdvisor</span>
+      <span style="font-size: 0.75rem; color: var(--text-muted);">Not affiliated with any bank or card issuer. Results are informational only.</span>
+    </div>
+  </footer>
+
+  <script>
+    // Hamburger
+    const btn = document.getElementById('hamburgerBtn');
+    const menu = document.getElementById('mobileMenu');
+
+    btn.addEventListener('click', () => {
+      const isOpen = menu.classList.toggle('open');
+      btn.classList.toggle('open', isOpen);
+      btn.setAttribute('aria-expanded', isOpen);
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('nav') && !e.target.closest('#mobileMenu')) {
+        menu.classList.remove('open');
+        btn.classList.remove('open');
+        btn.setAttribute('aria-expanded', false);
+      }
+    });
+
+    // Fade-up scroll observer
+    const fadeEls = document.querySelectorAll('[data-fade]');
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.1 });
+
+    fadeEls.forEach(el => io.observe(el));
+  </script>
+
+  {% block extra_scripts %}{% endblock %}
+</body>
+</html>

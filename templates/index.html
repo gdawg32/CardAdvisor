@@ -1,0 +1,1095 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}CardAdvisor — Find your best credit card{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* ─── HERO ──────────────────────────────────── */
+  .hero {
+    min-height: 100vh;
+    padding: 140px 6% 100px;
+    display: flex;
+    align-items: center;
+    background:
+      radial-gradient(ellipse 55% 55% at 15% 25%, rgba(30,80,50,0.55) 0%, transparent 70%),
+      radial-gradient(ellipse 35% 50% at 85% 85%, rgba(8,20,14,0.7) 0%, transparent 65%),
+      linear-gradient(150deg, var(--forest-3) 0%, var(--forest) 55%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* refined dot grid */
+  .hero::after {
+    content: '';
+    position: absolute; inset: 0;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.06) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events: none;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 30%, transparent 100%);
+  }
+
+  .hero-inner {
+    max-width: 1160px;
+    margin: 0 auto;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 64px;
+    align-items: center;
+    position: relative;
+    z-index: 1;
+  }
+
+  .hero-left {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+
+  /* eyebrow pill */
+  .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--lime-dim);
+    border: 1px solid var(--lime-border);
+    color: var(--lime);
+    font-size: 0.72rem;
+    font-weight: 500;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    padding: 5px 13px;
+    border-radius: 100px;
+    width: fit-content;
+  }
+
+  .eyebrow-pulse {
+    width: 5px; height: 5px;
+    background: var(--lime);
+    border-radius: 50%;
+    animation: dot-pulse 2.2s ease-in-out infinite;
+  }
+
+  @keyframes dot-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.7); }
+  }
+
+  /* headline — mixing Instrument Serif + Geist */
+  .hero-headline {
+    font-size: clamp(2.6rem, 5.2vw, 4.2rem);
+    line-height: 1.06;
+    letter-spacing: -0.035em;
+    color: #fff;
+    margin: 0;
+  }
+
+  .hero-headline .serif {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--lime);
+  }
+
+  .hero-sub {
+    font-size: clamp(0.9rem, 1.4vw, 1rem);
+    font-weight: 300;
+    color: var(--text-dim);
+    line-height: 1.7;
+    max-width: 420px;
+    margin: 0;
+  }
+
+  /* CTA block */
+  .cta-row {
+    display: flex;
+    align-items: center;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 9px;
+    padding: 5px 5px 5px 18px;
+    gap: 10px;
+    max-width: 440px;
+    backdrop-filter: blur(6px);
+  }
+
+  .cta-row-label {
+    flex: 1;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    letter-spacing: 0.01em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .cta-btn {
+    background: var(--lime);
+    color: var(--forest);
+    font-family: 'Geist', sans-serif;
+    font-weight: 600;
+    font-size: 0.82rem;
+    letter-spacing: 0.01em;
+    padding: 11px 20px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.18s, transform 0.12s, box-shadow 0.2s;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .cta-btn:hover {
+    background: #d8ff45;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 28px rgba(200,241,53,0.22);
+  }
+
+  .trust-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 2px;
+  }
+
+  .trust-item {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    letter-spacing: 0.02em;
+  }
+
+  .trust-dot {
+    width: 3px; height: 3px;
+    background: var(--text-muted);
+    border-radius: 50%;
+    opacity: 0.4;
+  }
+
+  /* ─── MOCKUP ─────────────────────────────── */
+  .hero-right {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+  }
+
+  .dashboard-card {
+    background: #fff;
+    border-radius: 16px;
+    padding: 22px;
+    width: 100%;
+    max-width: 360px;
+    box-shadow:
+      0 2px 4px rgba(0,0,0,0.08),
+      0 8px 24px rgba(0,0,0,0.18),
+      0 32px 64px rgba(0,0,0,0.35),
+      0 0 0 1px rgba(255,255,255,0.08);
+    color: #0c2218;
+    transform: perspective(900px) rotateY(-7deg) rotateX(2deg) translateZ(0);
+    transition: transform 0.5s ease;
+    will-change: transform;
+  }
+
+  .dashboard-card:hover {
+    transform: perspective(900px) rotateY(-2deg) rotateX(1deg) translateZ(0);
+  }
+
+  .dash-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .dash-title {
+    font-family: 'Geist', sans-serif;
+    font-weight: 600;
+    font-size: 0.78rem;
+    color: #111;
+    letter-spacing: -0.01em;
+  }
+
+  .dash-label {
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    background: #f0fdf4;
+    color: #15803d;
+    padding: 3px 8px;
+    border-radius: 4px;
+  }
+
+  /* card rows */
+  .card-result {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    padding: 10px 10px;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    transition: background 0.15s;
+  }
+
+  .card-result:hover { background: #f9fafb; }
+
+  .card-result.rank-1 {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+  }
+
+  .card-result.rank-1:hover { background: #ecfdf5; }
+
+  .rank-num {
+    font-family: 'Geist', sans-serif;
+    font-weight: 600;
+    font-size: 0.68rem;
+    color: #9ca3af;
+    min-width: 16px;
+  }
+
+  .card-result.rank-1 .rank-num { color: #16a34a; }
+
+  .card-chip {
+    width: 36px;
+    height: 24px;
+    border-radius: 4px;
+    font-family: 'Geist', sans-serif;
+    font-weight: 700;
+    font-size: 0.55rem;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    flex-shrink: 0;
+  }
+
+  .card-meta { flex: 1; min-width: 0; }
+
+  .card-meta-name {
+    font-family: 'Geist', sans-serif;
+    font-weight: 600;
+    font-size: 0.75rem;
+    color: #111;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .card-meta-sub {
+    font-size: 0.63rem;
+    color: #9ca3af;
+    margin-top: 1px;
+  }
+
+  .card-val { text-align: right; flex-shrink: 0; }
+
+  .card-val-num {
+    font-family: 'Geist', sans-serif;
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: #111;
+  }
+
+  .card-result.rank-1 .card-val-num { color: #15803d; }
+
+  .card-val-sub {
+    font-size: 0.6rem;
+    color: #9ca3af;
+    margin-top: 1px;
+  }
+
+  /* score bars */
+  .score-section {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid #f3f4f6;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .score-row-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.62rem;
+    color: #9ca3af;
+    margin-bottom: 4px;
+  }
+
+  .score-bar-track {
+    height: 4px;
+    background: #f3f4f6;
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .score-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+  }
+
+  .dash-footer {
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid #f3f4f6;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .score-badge {
+    background: var(--forest);
+    color: var(--lime);
+    font-family: 'Geist', sans-serif;
+    font-weight: 700;
+    font-size: 1.1rem;
+    padding: 8px 14px;
+    border-radius: 7px;
+    letter-spacing: -0.02em;
+  }
+
+  .dash-footer-text {}
+  .dash-footer-text strong {
+    display: block;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: #111;
+  }
+  .dash-footer-text span {
+    font-size: 0.62rem;
+    color: #9ca3af;
+  }
+
+  /* ─── HOW IT WORKS ───────────────────────── */
+  .section-wrapper {
+    padding: 100px 6%;
+  }
+
+  .section-head {
+    max-width: 1160px;
+    margin: 0 auto 52px;
+  }
+
+  .section-eyebrow {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--lime);
+    margin-bottom: 10px;
+  }
+
+  .section-title {
+    font-family: 'Geist', sans-serif;
+    font-weight: 600;
+    font-size: clamp(1.7rem, 3vw, 2.4rem);
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+    color: #fff;
+    margin-bottom: 12px;
+  }
+
+  .section-title .serif {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  .section-sub {
+    font-size: 0.9rem;
+    font-weight: 300;
+    color: var(--text-muted);
+    line-height: 1.7;
+    max-width: 440px;
+  }
+
+  .steps-grid {
+    max-width: 1160px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+
+  .step-card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 28px 24px;
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.25s, transform 0.25s;
+  }
+
+  .step-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1.5px;
+    background: var(--lime);
+    transform: scaleX(0);
+    transform-origin: left center;
+    transition: transform 0.35s ease;
+  }
+
+  .step-card:hover {
+    border-color: rgba(200,241,53,0.18);
+    transform: translateY(-3px);
+  }
+
+  .step-card:hover::before { transform: scaleX(1); }
+
+  .step-number {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 2.8rem;
+    line-height: 1;
+    margin-bottom: 20px;
+    letter-spacing: -0.02em;
+    display: inline-block;
+
+    /* default: dim lime */
+    color: rgba(200, 241, 53, 0.18);
+    text-shadow: none;
+
+    transition:
+      color 0.35s ease,
+      text-shadow 0.35s ease;
+  }
+
+  .step-card:hover .step-number {
+    color: rgba(200, 241, 53, 0.92);
+    text-shadow:
+      0 0 12px rgba(200, 241, 53, 0.6),
+      0 0 28px rgba(200, 241, 53, 0.35),
+      0 0 56px rgba(200, 241, 53, 0.15);
+  }
+
+  /* icon using CSS shapes */
+  .step-icon-wrap {
+    width: 36px; height: 36px;
+    background: var(--lime-dim);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 16px;
+  }
+
+  .step-icon-wrap svg {
+    width: 18px; height: 18px;
+    fill: var(--lime);
+  }
+
+  .step-title {
+    font-family: 'Geist', sans-serif;
+    font-weight: 600;
+    font-size: 0.95rem;
+    color: #fff;
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+
+  .step-desc {
+    font-size: 0.82rem;
+    font-weight: 300;
+    color: var(--text-muted);
+    line-height: 1.65;
+  }
+
+  /* ─── CTA SECTION ────────────────────────── */
+  .cta-section {
+    padding: 0 6% 110px;
+  }
+
+  .cta-block {
+    max-width: 1160px;
+    margin: 0 auto;
+    background: linear-gradient(135deg, var(--forest-3) 0%, var(--forest-2) 100%);
+    border: 1px solid rgba(200,241,53,0.12);
+    border-radius: 20px;
+    padding: 72px 56px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .cta-block::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 280px; height: 280px;
+    background: radial-gradient(circle, rgba(200,241,53,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .cta-block::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: -80px;
+    width: 240px; height: 240px;
+    background: radial-gradient(circle, rgba(200,241,53,0.04) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .cta-block-inner { position: relative; z-index: 1; }
+
+  .cta-block-title {
+    font-family: 'Geist', sans-serif;
+    font-weight: 600;
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    letter-spacing: -0.025em;
+    line-height: 1.2;
+    margin-bottom: 10px;
+  }
+
+  .cta-block-title .serif {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  .cta-block-sub {
+    font-size: 0.9rem;
+    font-weight: 300;
+    color: var(--text-muted);
+    margin-bottom: 32px;
+  }
+
+  .cta-btn-large {
+    display: inline-block;
+    background: var(--lime);
+    color: var(--forest);
+    font-family: 'Geist', sans-serif;
+    font-weight: 600;
+    font-size: 0.88rem;
+    letter-spacing: 0.01em;
+    padding: 14px 36px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.18s, transform 0.12s, box-shadow 0.2s;
+  }
+
+  .cta-btn-large:hover {
+    background: #d8ff45;
+    transform: translateY(-2px);
+    box-shadow: 0 14px 36px rgba(200,241,53,0.25);
+  }
+
+  /* ─── RESPONSIVE ─────────────────────────── */
+  @media (max-width: 960px) {
+    .hero-inner {
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+
+    .hero-right { display: none; }
+
+    .hero-left { align-items: center; text-align: center; }
+
+    .hero-sub { max-width: 100%; text-align: center; }
+
+    .cta-row { max-width: 100%; }
+
+    .trust-row { justify-content: center; }
+
+    .steps-grid { grid-template-columns: 1fr; gap: 12px; }
+
+    .cta-block { padding: 48px 28px; }
+  }
+
+  @media (max-width: 600px) {
+    .hero { padding: 130px 6% 70px; }
+
+    .cta-row {
+      flex-direction: column;
+      padding: 8px;
+      align-items: stretch;
+    }
+
+    .cta-row-label { display: none; }
+
+    .cta-btn {
+      width: 100%;
+      text-align: center;
+      padding: 13px;
+    }
+  }
+
+  /* ─── CARD SCENE ─────────────────────────── */
+      .card-scene {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+      }
+
+      /* ─── CREDIT CARD ────────────────────────── */
+      .cc-card {
+        width: 360px;
+        height: 220px;
+        border-radius: 18px;
+        padding: 24px 28px;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+
+        /* deep navy-to-slate gradient — premium feel */
+        background: linear-gradient(
+          135deg,
+          #0f1f3d 0%,
+          #1a3260 35%,
+          #1e3a8a 65%,
+          #1d4ed8 100%
+        );
+
+        box-shadow:
+          0 2px 4px rgba(0,0,0,0.15),
+          0 10px 28px rgba(0,0,0,0.35),
+          0 40px 72px rgba(0,0,0,0.45),
+          inset 0 1px 0 rgba(255,255,255,0.12);
+
+        transform: perspective(900px) rotateY(-8deg) rotateX(3deg) translateZ(0);
+        transition: transform 0.5s ease;
+      }
+
+      .cc-card:hover {
+        transform: perspective(900px) rotateY(-2deg) rotateX(1deg) translateZ(0);
+      }
+
+      /* subtle shine overlay */
+      .cc-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          135deg,
+          rgba(255,255,255,0.08) 0%,
+          rgba(255,255,255,0) 50%,
+          rgba(255,255,255,0.04) 100%
+        );
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      /* decorative background circles */
+      .cc-circle {
+        position: absolute;
+        border-radius: 50%;
+        pointer-events: none;
+      }
+
+      .cc-circle-1 {
+        width: 260px; height: 260px;
+        top: -80px; right: -60px;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(255,255,255,0.06);
+      }
+
+      .cc-circle-2 {
+        width: 160px; height: 160px;
+        bottom: -50px; left: 20px;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.05);
+      }
+
+      /* all direct children above circles */
+      .cc-card > *:not(.cc-circle) { position: relative; z-index: 2; }
+
+      /* ─── TOP ROW ─────────────────────────────── */
+      .cc-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .cc-bank {
+        font-family: 'Geist', sans-serif;
+        font-weight: 600;
+        font-size: 0.8rem;
+        letter-spacing: 0.04em;
+        color: rgba(255,255,255,0.85);
+        text-transform: uppercase;
+      }
+
+      /* Mastercard-style overlapping circles */
+      .cc-network {
+        display: flex;
+        align-items: center;
+      }
+
+      .cc-mc-left,
+      .cc-mc-right {
+        width: 26px; height: 26px;
+        border-radius: 50%;
+      }
+
+      .cc-mc-left {
+        background: #eb001b;
+        opacity: 0.92;
+        z-index: 1;
+        position: relative;
+      }
+
+      .cc-mc-right {
+        background: #f79e1b;
+        opacity: 0.92;
+        margin-left: -10px;
+        mix-blend-mode: screen;
+      }
+
+      /* ─── EMV CHIP ───────────────────────────── */
+      .cc-chip {
+        width: 44px; height: 34px;
+        background: linear-gradient(135deg, #d4af37, #f5e17a, #b8961e);
+        border-radius: 6px;
+        position: relative;
+        box-shadow: 0 1px 4px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.3);
+        margin-top: 2px;
+      }
+
+      /* chip circuit lines */
+      .cc-chip-h,
+      .cc-chip-v {
+        position: absolute;
+        background: rgba(160,120,20,0.6);
+      }
+
+      .cc-chip-h {
+        height: 1px; width: 100%;
+        top: 50%; left: 0;
+        transform: translateY(-50%);
+      }
+
+      .cc-chip-v {
+        width: 1px; height: 100%;
+        left: 50%; top: 0;
+        transform: translateX(-50%);
+      }
+
+      .cc-chip-contact {
+        position: absolute;
+        width: 10px; height: 9px;
+        background: linear-gradient(135deg, #c8a000, #f0d060);
+        border-radius: 1px;
+        border: 0.5px solid rgba(160,120,20,0.4);
+      }
+
+      .cc-chip-tl { top: 4px; left: 5px; }
+      .cc-chip-tr { top: 4px; right: 5px; }
+      .cc-chip-bl { bottom: 4px; left: 5px; }
+      .cc-chip-br { bottom: 4px; right: 5px; }
+
+      /* ─── CARD NUMBER ─────────────────────────── */
+      .cc-number {
+        display: flex;
+        gap: 14px;
+        align-items: center;
+        font-family: 'Geist', sans-serif;
+        font-weight: 400;
+        font-size: 1rem;
+        letter-spacing: 0.14em;
+        color: rgba(255,255,255,0.88);
+        margin-top: 4px;
+      }
+
+      /* ─── BOTTOM ROW ─────────────────────────── */
+      .cc-bottom {
+        display: flex;
+        align-items: flex-end;
+        gap: 24px;
+      }
+
+      .cc-field-label {
+        font-size: 0.55rem;
+        font-weight: 500;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.45);
+        margin-bottom: 3px;
+      }
+
+      .cc-field-val {
+        font-family: 'Geist', sans-serif;
+        font-size: 0.82rem;
+        font-weight: 500;
+        letter-spacing: 0.02em;
+        color: rgba(255,255,255,0.9);
+      }
+
+      .cc-expiry-wrap { flex-shrink: 0; }
+
+      .cc-card-name {
+        margin-left: auto;
+        font-family: 'Instrument Serif', serif;
+        font-style: italic;
+        font-size: 0.85rem;
+        color: rgba(255,255,255,0.55);
+        letter-spacing: 0.01em;
+        align-self: flex-end;
+      }
+
+      /* ─── RANK TAG ───────────────────────────── */
+      .cc-rank-tag {
+        position: absolute;
+        top: -12px;
+        right: 12px;
+        background: var(--lime);
+        color: var(--forest);
+        font-family: 'Geist', sans-serif;
+        font-weight: 600;
+        font-size: 0.65rem;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        padding: 5px 12px;
+        border-radius: 100px;
+        box-shadow: 0 4px 12px rgba(200,241,53,0.3);
+        white-space: nowrap;
+      }
+
+      /* ─── REWARD BADGE ───────────────────────── */
+      .cc-badge {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.1);
+        border-radius: 12px;
+        overflow: hidden;
+        backdrop-filter: blur(8px);
+        width: 300px;
+      }
+
+      .cc-badge-left,
+      .cc-badge-right {
+        flex: 1;
+        padding: 14px 18px;
+        text-align: center;
+      }
+
+      .cc-badge-divider {
+        width: 1px;
+        height: 36px;
+        background: rgba(255,255,255,0.1);
+        flex-shrink: 0;
+      }
+
+      .cc-badge-score {
+        font-family: 'Geist', sans-serif;
+        font-weight: 700;
+        font-size: 1.4rem;
+        color: var(--lime);
+        letter-spacing: -0.03em;
+        line-height: 1;
+      }
+
+      .cc-badge-score-label {
+        font-size: 0.65rem;
+        color: var(--text-muted);
+        margin-top: 3px;
+        letter-spacing: 0.02em;
+      }
+
+      .cc-badge-val {
+        font-family: 'Geist', sans-serif;
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: #fff;
+        letter-spacing: -0.02em;
+        line-height: 1;
+      }
+
+      .cc-badge-val-label {
+        font-size: 0.65rem;
+        color: var(--text-muted);
+        margin-top: 3px;
+        letter-spacing: 0.02em;
+      }
+
+</style>
+{% endblock %}
+
+{% block content %}
+
+<!-- ─── HERO ──────────────────────────────────── -->
+<section class="hero" id="home">
+  <div class="hero-inner">
+
+    <!-- Left -->
+    <div class="hero-left">
+
+
+      <h1 class="hero-headline" data-fade data-delay="2">
+        Choose the right<br>
+        credit card.<br>
+        <span class="serif">Maximize rewards.</span>
+      </h1>
+
+      <p class="hero-sub" data-fade data-delay="3">
+        CardAdvisor analyzes your spending across categories and recommends the best credit card with clear, explainable logic. No guesswork, no bank bias.
+      </p>
+
+
+      <div class="trust-row" data-fade data-delay="5">
+        <span class="trust-item">Explainable scoring</span>
+        <span class="trust-dot"></span>
+        <span class="trust-item">No bank bias</span>
+        <span class="trust-dot"></span>
+        <span class="trust-item">Personalized results</span>
+      </div>
+
+    </div>
+
+    <!-- Right — credit card mockup, desktop only -->
+    <div class="hero-right" data-fade data-delay="3">
+        <div class="card-scene">
+  
+          <!-- The physical card -->
+          <div class="cc-card">
+  
+            <!-- background texture circles -->
+            <div class="cc-circle cc-circle-1"></div>
+            <div class="cc-circle cc-circle-2"></div>
+  
+            <!-- Top row: bank name + network logo -->
+            <div class="cc-top">
+              <span class="cc-bank">Axis Bank</span>
+              <!-- Mastercard circles via CSS -->
+              <div class="cc-network">
+                <div class="cc-mc-left"></div>
+                <div class="cc-mc-right"></div>
+              </div>
+            </div>
+  
+            <!-- EMV Chip -->
+            <div class="cc-chip">
+              <div class="cc-chip-h"></div>
+              <div class="cc-chip-v"></div>
+              <div class="cc-chip-contact cc-chip-tl"></div>
+              <div class="cc-chip-contact cc-chip-tr"></div>
+              <div class="cc-chip-contact cc-chip-bl"></div>
+              <div class="cc-chip-contact cc-chip-br"></div>
+            </div>
+  
+            <!-- Card number -->
+            <div class="cc-number">
+              <span>4716</span>
+              <span>&#8226;&#8226;&#8226;&#8226;</span>
+              <span>&#8226;&#8226;&#8226;&#8226;</span>
+              <span>8842</span>
+            </div>
+  
+            <!-- Bottom row: holder + expiry -->
+            <div class="cc-bottom">
+              <div class="cc-holder-wrap">
+                <div class="cc-field-label">Card Holder</div>
+                <div class="cc-field-val">GAURESH P A</div>
+              </div>
+              <div class="cc-expiry-wrap">
+                <div class="cc-field-label">Expires</div>
+                <div class="cc-field-val">09 / 28</div>
+              </div>
+              <div class="cc-card-name">Axis Bank Reserve</div>
+            </div>
+  
+          </div>
+          <!-- end .cc-card -->
+  
+          <!-- Floating reward badge below card -->
+          <div class="cc-badge">
+            <div class="cc-badge-left">
+              <div class="cc-badge-score">94</div>
+              <div class="cc-badge-score-label">Match score</div>
+            </div>
+            <div class="cc-badge-divider"></div>
+            <div class="cc-badge-right">
+              <div class="cc-badge-val">&#8377;18,400</div>
+              <div class="cc-badge-val-label">Est. annual rewards</div>
+            </div>
+          </div>
+  
+          <!-- Small tag top-right of card -->
+          <div class="cc-rank-tag">#1 Recommended</div>
+  
+        </div>
+      </div>
+
+  </div>
+</section>
+
+
+<!-- ─── HOW IT WORKS ──────────────────────────── -->
+<section class="section-wrapper" id="how-it-works">
+
+    <div class="section-head">
+      <p class="section-eyebrow" data-fade>How it works</p>
+      <h2 class="section-title" data-fade data-delay="1">
+        Three steps to your <span class="serif">ideal card</span>
+      </h2>
+      <p class="section-sub" data-fade data-delay="2">
+        No lengthy forms. No hidden agendas. Data-driven card matching in under 30 seconds.
+      </p>
+    </div>
+  
+    <div class="steps-grid">
+  
+      <div class="step-card" data-fade data-delay="1">
+        <div class="step-number">01</div>
+        <div class="step-icon-wrap">
+          <svg viewBox="0 0 24 24"><path d="M3 13h2v7H3v-7zm4-5h2v12H7V8zm4-3h2v15h-2V5zm4 5h2v10h-2V10zm4-4h2v14h-2V6z"/></svg>
+        </div>
+        <div class="step-title">Enter your spending</div>
+        <p class="step-desc">Tell us how much you spend monthly across categories such as dining, travel, online shopping, fuel, and more.</p>
+      </div>
+  
+      <div class="step-card" data-fade data-delay="2">
+        <div class="step-number">02</div>
+        <div class="step-icon-wrap">
+          <svg viewBox="0 0 24 24"><path d="M17 12h-5v5h5v-5zM16 1v2H8V1H6v2H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-1V1h-2zm3 18H5V8h14v11z"/></svg>
+        </div>
+        <div class="step-title">We calculate rewards</div>
+        <p class="step-desc">Our engine computes net annual value for 50+ cards accounting for fees, bonus caps, and reward redemption rates.</p>
+      </div>
+  
+      <div class="step-card" data-fade data-delay="3">
+        <div class="step-number">03</div>
+        <div class="step-icon-wrap">
+          <svg viewBox="0 0 24 24"><path d="M3 13h2v-2H3v2zm0 4h2v-2H3v2zm0-8h2V7H3v2zm4 4h14v-2H7v2zm0 4h14v-2H7v2zM7 7v2h14V7H7z"/></svg>
+        </div>
+        <div class="step-title">Get ranked results</div>
+        <p class="step-desc">See a transparent scorecard with every card ranked and explained clearly, so you know exactly why each card was chosen.</p>
+      </div>
+  
+    </div>
+  
+  </section>
+  
+
+
+<!-- ─── CTA SECTION ───────────────────────────── -->
+<section class="cta-section" id="features">
+  <div class="cta-block" data-fade>
+    <div class="cta-block-inner">
+      <h2 class="cta-block-title">
+        Find your best card<br><span class="serif">in 30 seconds</span>
+      </h2>
+      <p class="cta-block-sub">Join thousands who have stopped leaving rewards on the table.</p>
+      <a href="#" class="cta-btn-large">Start Analysis</a>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
