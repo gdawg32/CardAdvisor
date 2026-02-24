@@ -88,3 +88,29 @@ Pending:
 2. Load sample dataset via Django admin
 3. Build decision engine as a service function
 4. Connect form → engine → ranked output
+
+## Phase 5 – Data Layer Implementation
+
+Defined normalized data models:
+
+- CreditCard
+- RewardCategory (one-to-many)
+
+Rationale:
+Reward rules vary by category and card, so storing them in a separate table avoids hardcoding and supports dynamic evaluation.
+
+Created database migrations and registered both models in Django admin.  
+Entered 11 cards covering different reward strategies (online cashback, flat cashback, fuel-focused, dining/travel, lounge-heavy, UPI-first).
+
+To avoid repetitive manual entry of reward rules, implemented a custom Django management command (`seed_rewards`) to populate RewardCategory records programmatically with the help of ChatGPT.
+
+Encountered an issue where the command was not detected due to incorrect folder naming (`managements` instead of `management`).  
+Resolved by fixing directory name.
+
+Current status:
+- Data model complete
+- Dataset populated
+- Reward rules seeded and verified in admin
+
+Next step:
+Implement deterministic decision engine as a service module and validate outputs in Django shell before UI integration.

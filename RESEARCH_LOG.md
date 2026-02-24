@@ -73,3 +73,44 @@ AI was used for:
 
 AI is **not** used for scoring or ranking logic.
 The decision engine will be deterministic and explainable.
+
+## Credit Card Data Sources
+
+Primary reference for card features and reward structures:
+
+- PaisaBazaar (card fees, category cashback, lounge availability)
+- Individual card product pages (issuer sites) for fee and lounge confirmation
+
+Used these to identify:
+
+- Category-based reward patterns (online, fuel, dining, travel)
+- Fee waiver thresholds
+- Forex markup ranges
+- Lounge access presence/absence
+
+## Handling Ambiguity
+
+Exact reward caps and income requirements vary by variant and are not consistently published.
+
+Resolution approach:
+- Used representative values aligned with typical ranges
+- Prioritized structural accuracy (which category earns more) over exact numbers
+
+This is documented as an assumption in README.
+
+## Community References
+
+Reddit threads (r/IndiaInvestments, r/CreditCardsIndia) were used to:
+- Validate typical effective cashback rates
+- Understand real user-reported caps and redemption behavior
+- Confirm that UPI-based cards (e.g., Kiwi) behave closer to flat cashback in practice
+
+These were used only to cross-check ranges, not as authoritative sources.
+
+## AI Usage Today
+
+AI was used for:
+- Structuring the Django data model
+- Designing the reward seeding command, to avoid manual entry and save time.
+
+AI was not used to generate reward values or ranking logic.
