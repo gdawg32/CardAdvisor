@@ -114,3 +114,48 @@ AI was used for:
 - Designing the reward seeding command, to avoid manual entry and save time.
 
 AI was not used to generate reward values or ranking logic.
+
+## Form and Decision Modeling Research
+
+ChatGPT web-search queries:
+
+- "multi criteria decision making normalization min max scoring"
+- "how to design explainable recommendation system weighted scoring"
+- "credit card cashback cap vs spend cap difference"
+- "forex markup credit card india how calculated"
+
+Key findings:
+
+- Monetary-only ranking is insufficient for decision support systems
+- Preferences should be modeled as weights, while eligibility conditions should be treated as hard constraints
+- Min–max normalization allows heterogeneous metrics (cashback, fee, lounge value) to be combined safely
+- Cost metrics must be inverted after normalization
+
+
+## Domain Validation
+
+Card benefit rules (cashback caps, spend caps, forex applicability, fee waivers) were validated against:
+
+- Paisabazaar card detail pages
+- Official issuer pages (HDFC, SBI, ICICI, Axis, HSBC, IDFC FIRST)
+- User discussions on Reddit for ambiguous cap interpretations
+
+Reddit was used only to clarify practical cap behavior where official wording was unclear.
+
+
+## Decision Engine Refinement
+
+ChatGPT was used to:
+
+- Suggest utility patterns for normalization and safe numeric handling
+- Compare alternative scoring approaches (pure net vs hybrid composite)
+- Identify the need for hard forex constraints for RuPay UPI cards
+- Review tie-breaking strategies for deterministic ranking
+
+Final implementation logic and all formulas were manually verified and tested against sample spend profiles.
+
+
+## Documentation Assistance
+
+ChatGPT was used to format the Markdown files into structured sections.  
+All content reflects the actual implementation and testing performed in the project.

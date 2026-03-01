@@ -1,0 +1,554 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Spending Profile — CardAdvisor{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* ─── PAGE SHELL ─────────────────────────────── */
+  .analyze-page {
+    min-height: 100vh;
+    padding: 100px 6% 80px;
+    background:
+      radial-gradient(ellipse 50% 40% at 10% 20%, rgba(24,56,39,0.5) 0%, transparent 70%),
+      radial-gradient(ellipse 35% 50% at 90% 80%, rgba(8,18,12,0.6) 0%, transparent 65%),
+      var(--forest);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* dot grid — same as hero */
+  .analyze-page::after {
+    content: '';
+    position: absolute; inset: 0;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events: none;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 100%);
+  }
+
+  .analyze-inner {
+    position: relative; z-index: 1;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  /* ─── PAGE HEADER ────────────────────────────── */
+  .page-header {
+    margin-bottom: 44px;
+  }
+
+  .page-eyebrow {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--lime);
+    margin-bottom: 10px;
+  }
+
+  .page-title {
+    font-family: 'Geist', sans-serif;
+    font-weight: 600;
+    font-size: clamp(1.8rem, 3.5vw, 2.6rem);
+    letter-spacing: -0.028em;
+    line-height: 1.1;
+    color: #fff;
+    margin-bottom: 10px;
+  }
+
+  .page-title .serif {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  .page-sub {
+    font-size: 0.88rem;
+    font-weight: 300;
+    color: var(--text-muted);
+    line-height: 1.65;
+  }
+
+  /* ─── FORM CARD ──────────────────────────────── */
+  .form-card {
+    background: rgba(255,255,255,0.035);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    overflow: hidden;
+  }
+
+  /* ─── FORM SECTION ───────────────────────────── */
+  .form-section {
+    padding: 32px 36px;
+    border-bottom: 1px solid var(--card-border);
+  }
+
+  .form-section:last-of-type {
+    border-bottom: none;
+  }
+
+  .form-section-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 22px;
+  }
+
+  .form-section-num {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: rgba(200,241,53,0.3);
+    flex-shrink: 0;
+    line-height: 1;
+  }
+
+  .form-section-title {
+    font-family: 'Geist', sans-serif;
+    font-weight: 600;
+    font-size: 0.82rem;
+    letter-spacing: 0.02em;
+    color: rgba(255,255,255,0.75);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+  }
+
+  /* ─── SPEND GRID ─────────────────────────────── */
+  .spend-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+
+  /* ─── INPUT FIELD ────────────────────────────── */
+  .field-wrap {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    position: relative;
+  }
+
+  .field-label {
+    font-size: 0.65rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+
+  .input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .input-prefix {
+    position: absolute;
+    left: 12px;
+    font-size: 0.82rem;
+    font-weight: 400;
+    color: rgba(255,255,255,0.3);
+    pointer-events: none;
+    font-family: 'Geist', sans-serif;
+    z-index: 1;
+  }
+
+  .field-input {
+    width: 100%;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    padding: 10px 12px 10px 26px;
+    font-family: 'Geist', sans-serif;
+    font-size: 0.88rem;
+    font-weight: 400;
+    color: #fff;
+    outline: none;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+
+  .field-input::placeholder {
+    color: rgba(255,255,255,0.18);
+    font-weight: 300;
+  }
+
+  /* remove number input arrows */
+  .field-input::-webkit-inner-spin-button,
+  .field-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+  .field-input[type=number] { -moz-appearance: textfield; }
+
+  .field-input:focus {
+    border-color: rgba(200,241,53,0.35);
+    background: rgba(200,241,53,0.04);
+    box-shadow: 0 0 0 3px rgba(200,241,53,0.07);
+  }
+
+  /* ─── FINANCIAL GRID ─────────────────────────── */
+  .financial-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .financial-grid .field-wrap.full {
+    grid-column: span 2;
+  }
+
+  /* no prefix variant */
+  .field-input.no-prefix {
+    padding-left: 12px;
+  }
+
+  /* ─── PREFERENCES (BOOLEAN TOGGLES) ─────────── */
+  .pref-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .pref-hint {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    font-weight: 300;
+    line-height: 1.5;
+    margin-bottom: 18px;
+    padding: 10px 14px;
+    background: rgba(200,241,53,0.04);
+    border: 1px solid rgba(200,241,53,0.1);
+    border-radius: 7px;
+  }
+
+  /* toggle row */
+  .toggle-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 9px;
+    padding: 13px 16px;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    user-select: none;
+  }
+
+  .toggle-wrap:hover {
+    border-color: rgba(200,241,53,0.18);
+    background: rgba(200,241,53,0.03);
+  }
+
+  .toggle-wrap.active {
+    border-color: rgba(200,241,53,0.35);
+    background: rgba(200,241,53,0.06);
+  }
+
+  .toggle-label-group { display: flex; flex-direction: column; gap: 2px; }
+
+  .toggle-label {
+    font-family: 'Geist', sans-serif;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: rgba(255,255,255,0.8);
+    letter-spacing: -0.01em;
+  }
+
+  .toggle-wrap.active .toggle-label { color: #fff; }
+
+  .toggle-sub {
+    font-size: 0.65rem;
+    font-weight: 300;
+    color: var(--text-muted);
+  }
+
+  /* the pill toggle switch */
+  .toggle-switch {
+    width: 38px; height: 21px;
+    background: rgba(255,255,255,0.08);
+    border-radius: 100px;
+    position: relative;
+    flex-shrink: 0;
+    transition: background 0.25s;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+
+  .toggle-switch::after {
+    content: '';
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 13px; height: 13px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.35);
+    transition: transform 0.25s ease, background 0.25s;
+  }
+
+  .toggle-wrap.active .toggle-switch {
+    background: var(--lime);
+    border-color: var(--lime);
+  }
+
+  .toggle-wrap.active .toggle-switch::after {
+    transform: translateX(17px);
+    background: var(--forest);
+  }
+
+  /* hidden inputs for form submission */
+  .toggle-input { display: none; }
+
+  /* ─── FORM FOOTER ────────────────────────────── */
+  .form-footer {
+    padding: 24px 36px 32px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    border-top: 1px solid var(--card-border);
+  }
+
+  .form-footer-note {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    font-weight: 300;
+    line-height: 1.5;
+    max-width: 280px;
+  }
+
+  .submit-btn {
+    background: var(--lime);
+    color: var(--forest);
+    font-family: 'Geist', sans-serif;
+    font-weight: 600;
+    font-size: 0.85rem;
+    letter-spacing: 0.01em;
+    padding: 13px 32px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    transition: background 0.18s, transform 0.12s, box-shadow 0.2s;
+  }
+
+  .submit-btn:hover {
+    background: #d8ff45;
+    transform: translateY(-1px);
+    box-shadow: 0 10px 28px rgba(200,241,53,0.22);
+  }
+
+  .submit-btn:active {
+    transform: translateY(0);
+    box-shadow: none;
+  }
+
+  /* ─── RESPONSIVE ─────────────────────────────── */
+  @media (max-width: 640px) {
+    .analyze-page { padding: 100px 4% 60px; }
+    .form-section { padding: 24px 20px; }
+    .form-footer { padding: 20px; flex-direction: column; align-items: stretch; }
+    .form-footer-note { max-width: 100%; }
+    .submit-btn { width: 100%; text-align: center; padding: 15px; }
+    .spend-grid { grid-template-columns: repeat(2, 1fr); }
+    .pref-grid { grid-template-columns: 1fr; }
+    .financial-grid .field-wrap.full { grid-column: span 2; }
+  }
+
+  @media (max-width: 420px) {
+    .spend-grid { grid-template-columns: 1fr; }
+    .financial-grid { grid-template-columns: 1fr; }
+    .financial-grid .field-wrap.full { grid-column: span 1; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="analyze-page">
+  <div class="analyze-inner">
+
+    <!-- Page header -->
+    <div class="page-header" data-fade>
+      <p class="page-eyebrow">Step 1 of 1</p>
+      <h1 class="page-title">Your spending <span class="serif">profile</span></h1>
+      <p class="page-sub">Fill in what you spend and what you value. We handle the rest.</p>
+    </div>
+
+    <!-- Form card -->
+    <div class="form-card" data-fade data-delay="1">
+      <form method="post">
+        {% csrf_token %}
+
+        <!-- Section 1: Monthly Spending -->
+        <div class="form-section">
+          <div class="form-section-header">
+            <span class="form-section-num">01</span>
+            <span class="form-section-title">Monthly spending</span>
+          </div>
+
+          <div class="spend-grid">
+
+            <div class="field-wrap">
+              <label class="field-label" for="id_online">Online shopping</label>
+              <div class="input-wrap">
+                <span class="input-prefix">&#8377;</span>
+                <input class="field-input" type="number" name="online" id="id_online" min="0" placeholder="0">
+              </div>
+            </div>
+
+            <div class="field-wrap">
+              <label class="field-label" for="id_fuel">Fuel</label>
+              <div class="input-wrap">
+                <span class="input-prefix">&#8377;</span>
+                <input class="field-input" type="number" name="fuel" id="id_fuel" min="0" placeholder="0">
+              </div>
+            </div>
+
+            <div class="field-wrap">
+              <label class="field-label" for="id_dining">Dining</label>
+              <div class="input-wrap">
+                <span class="input-prefix">&#8377;</span>
+                <input class="field-input" type="number" name="dining" id="id_dining" min="0" placeholder="0">
+              </div>
+            </div>
+
+            <div class="field-wrap">
+              <label class="field-label" for="id_travel">Travel</label>
+              <div class="input-wrap">
+                <span class="input-prefix">&#8377;</span>
+                <input class="field-input" type="number" name="travel" id="id_travel" min="0" placeholder="0">
+              </div>
+            </div>
+
+            <div class="field-wrap">
+              <label class="field-label" for="id_groceries">Groceries</label>
+              <div class="input-wrap">
+                <span class="input-prefix">&#8377;</span>
+                <input class="field-input" type="number" name="groceries" id="id_groceries" min="0" placeholder="0">
+              </div>
+            </div>
+
+            <div class="field-wrap">
+              <label class="field-label" for="id_other">Other</label>
+              <div class="input-wrap">
+                <span class="input-prefix">&#8377;</span>
+                <input class="field-input" type="number" name="other" id="id_other" min="0" placeholder="0">
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Section 2: Financial Details -->
+        <div class="form-section">
+          <div class="form-section-header">
+            <span class="form-section-num">02</span>
+            <span class="form-section-title">Financial details</span>
+          </div>
+
+          <div class="financial-grid">
+
+            <div class="field-wrap">
+              <label class="field-label" for="id_monthly_foreign">Monthly foreign spend</label>
+              <div class="input-wrap">
+                <span class="input-prefix">&#8377;</span>
+                <input class="field-input" type="number" name="monthly_foreign" id="id_monthly_foreign" min="0" placeholder="0">
+              </div>
+            </div>
+
+            <div class="field-wrap">
+              <label class="field-label" for="id_annual_income">Annual income</label>
+              <div class="input-wrap">
+                <span class="input-prefix">&#8377;</span>
+                <input class="field-input" type="number" name="annual_income" id="id_annual_income" min="0" placeholder="0">
+              </div>
+            </div>
+
+            <div class="field-wrap full">
+              <label class="field-label" for="id_fee_tolerance">Maximum annual fee you are willing to pay</label>
+              <div class="input-wrap">
+                <span class="input-prefix">&#8377;</span>
+                <input class="field-input" type="number" name="fee_tolerance" id="id_fee_tolerance" min="0" placeholder="0">
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- Section 3: Preferences (boolean toggles) -->
+        <div class="form-section">
+          <div class="form-section-header">
+            <span class="form-section-num">03</span>
+            <span class="form-section-title">Preferences</span>
+          </div>
+
+          <p class="pref-hint">
+            Toggle what matters to you. These signals influence how cards are ranked — selected means it carries weight in the analysis.
+          </p>
+
+          <div class="pref-grid">
+
+            <label class="toggle-wrap" id="toggle-cashback">
+              <input class="toggle-input" type="hidden" name="weight_cashback" id="val-cashback" value="0">
+              <div class="toggle-label-group">
+                <span class="toggle-label">Cashback</span>
+                <span class="toggle-sub">Prioritise cards with cash returns</span>
+              </div>
+              <div class="toggle-switch"></div>
+            </label>
+
+            <label class="toggle-wrap" id="toggle-lounge">
+              <input class="toggle-input" type="hidden" name="weight_lounge" id="val-lounge" value="0">
+              <div class="toggle-label-group">
+                <span class="toggle-label">Lounge access</span>
+                <span class="toggle-sub">Airport lounge benefits matter</span>
+              </div>
+              <div class="toggle-switch"></div>
+            </label>
+
+            <label class="toggle-wrap" id="toggle-fee">
+              <input class="toggle-input" type="hidden" name="weight_fee" id="val-fee" value="0">
+              <div class="toggle-label-group">
+                <span class="toggle-label">Low annual fee</span>
+                <span class="toggle-sub">Minimise yearly card cost</span>
+              </div>
+              <div class="toggle-switch"></div>
+            </label>
+
+            <label class="toggle-wrap" id="toggle-forex">
+              <input class="toggle-input" type="hidden" name="weight_forex" id="val-forex" value="0">
+              <div class="toggle-label-group">
+                <span class="toggle-label">Low forex markup</span>
+                <span class="toggle-sub">Spend abroad without high fees</span>
+              </div>
+              <div class="toggle-switch"></div>
+            </label>
+
+          </div>
+        </div>
+
+        <!-- Footer: note + submit -->
+        <div class="form-footer">
+          <p class="form-footer-note">
+            Your data is used only to compute card scores. Nothing is stored or shared.
+          </p>
+          <button type="submit" class="submit-btn">Analyze cards</button>
+        </div>
+
+      </form>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  // Toggle interaction — flips hidden input between 0 and 1
+  document.querySelectorAll('.toggle-wrap').forEach(wrap => {
+    wrap.addEventListener('click', () => {
+      const input = wrap.querySelector('.toggle-input');
+      const isActive = wrap.classList.toggle('active');
+      input.value = isActive ? 1 : 0;
+    });
+  });
+</script>
+{% endblock %}

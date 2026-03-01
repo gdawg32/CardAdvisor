@@ -1,0 +1,589 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Results — CardAdvisor{% endblock %}
+
+{% block extra_head %}
+<style>
+  /* ─── PAGE SHELL ─────────────────────────────── */
+  .results-page {
+    min-height: 100vh;
+    padding: 100px 6% 80px;
+    background:
+      radial-gradient(ellipse 50% 40% at 10% 20%, rgba(24,56,39,0.5) 0%, transparent 70%),
+      radial-gradient(ellipse 35% 50% at 90% 80%, rgba(8,18,12,0.6) 0%, transparent 65%),
+      var(--forest);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .results-page::after {
+    content: '';
+    position: absolute; inset: 0;
+    background-image: radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size: 32px 32px;
+    pointer-events: none;
+    mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 20%, transparent 100%);
+  }
+
+  .results-inner {
+    position: relative; z-index: 1;
+    max-width: 1100px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  /* ─── PAGE HEADER ─────────────────────────────── */
+  .results-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+
+  .results-header-left {}
+
+  .page-eyebrow {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--lime);
+    margin-bottom: 8px;
+  }
+
+  .page-title {
+    font-family: 'Geist', sans-serif;
+    font-weight: 600;
+    font-size: clamp(1.7rem, 3.2vw, 2.4rem);
+    letter-spacing: -0.028em;
+    line-height: 1.1;
+    color: #fff;
+  }
+
+  .page-title .serif {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-weight: 400;
+  }
+
+  .results-meta {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    font-weight: 300;
+    margin-top: 6px;
+  }
+
+  .rerun-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 7px;
+    padding: 9px 16px;
+    font-family: 'Geist', sans-serif;
+    font-size: 0.78rem;
+    font-weight: 500;
+    color: var(--text-dim);
+    text-decoration: none;
+    transition: border-color 0.18s, color 0.18s;
+    white-space: nowrap;
+  }
+
+  .rerun-btn:hover {
+    border-color: rgba(255,255,255,0.2);
+    color: #fff;
+  }
+
+  .rerun-btn svg {
+    width: 13px; height: 13px;
+    fill: currentColor;
+    opacity: 0.6;
+  }
+
+  /* ─── TOP CARD ────────────────────────────────── */
+  .top-card {
+    background: linear-gradient(135deg, rgba(24,56,39,0.8) 0%, rgba(18,42,28,0.9) 100%);
+    border: 1px solid rgba(200,241,53,0.2);
+    border-radius: 18px;
+    padding: 32px 36px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* glow top edge */
+  .top-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(200,241,53,0.5), transparent);
+  }
+
+  /* background circles */
+  .top-card::after {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(200,241,53,0.05) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .top-card-inner {
+    position: relative; z-index: 1;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 32px;
+    align-items: center;
+  }
+
+  .top-card-left {}
+
+  .top-card-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--lime);
+    margin-bottom: 10px;
+  }
+
+  .top-card-eyebrow-dot {
+    width: 5px; height: 5px;
+    background: var(--lime);
+    border-radius: 50%;
+  }
+
+  .top-card-name {
+    font-family: 'Geist', sans-serif;
+    font-weight: 600;
+    font-size: clamp(1.4rem, 2.5vw, 2rem);
+    letter-spacing: -0.025em;
+    color: #fff;
+    margin-bottom: 6px;
+  }
+
+  .top-card-sub {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    font-weight: 300;
+  }
+
+  .top-card-sub strong {
+    color: rgba(255,255,255,0.7);
+    font-weight: 500;
+  }
+
+  .top-card-tags {
+    display: flex;
+    gap: 8px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+
+  .tag {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 100px;
+  }
+
+  .tag-lime {
+    background: rgba(200,241,53,0.1);
+    border: 1px solid rgba(200,241,53,0.25);
+    color: var(--lime);
+  }
+
+  .tag-muted {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--text-muted);
+  }
+
+  .top-card-value {
+    text-align: right;
+  }
+
+  .top-card-val-num {
+    font-family: 'Geist', sans-serif;
+    font-weight: 700;
+    font-size: clamp(2rem, 3.5vw, 2.8rem);
+    letter-spacing: -0.04em;
+    color: #fff;
+    line-height: 1;
+  }
+
+  .top-card-val-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin-top: 5px;
+    letter-spacing: 0.03em;
+  }
+
+  /* mini stat row under value */
+  .top-card-stats {
+    display: flex;
+    gap: 0;
+    margin-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    padding-top: 20px;
+  }
+
+  .top-stat {
+    flex: 1;
+    padding: 0 20px;
+    border-right: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .top-stat:first-child { padding-left: 0; }
+  .top-stat:last-child { border-right: none; }
+
+  .top-stat-val {
+    font-family: 'Geist', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    color: #fff;
+    letter-spacing: -0.02em;
+    margin-bottom: 3px;
+  }
+
+  .top-stat-label {
+    font-size: 0.65rem;
+    font-weight: 400;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+
+  /* ─── RESULTS TABLE ───────────────────────────── */
+  .table-card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid var(--card-border);
+    border-radius: 18px;
+    overflow: hidden;
+  }
+
+  .table-header {
+    padding: 20px 28px 16px;
+    border-bottom: 1px solid var(--card-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .table-title {
+    font-family: 'Geist', sans-serif;
+    font-weight: 600;
+    font-size: 0.82rem;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .table-count {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+  }
+
+  .results-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  .results-table thead tr {
+    border-bottom: 1px solid var(--card-border);
+  }
+
+  .results-table thead th {
+    padding: 12px 20px;
+    font-family: 'Geist', sans-serif;
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+    text-align: left;
+    white-space: nowrap;
+  }
+
+  .results-table thead th.r { text-align: right; }
+
+  .results-table tbody tr {
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    transition: background 0.15s;
+  }
+
+  .results-table tbody tr:last-child { border-bottom: none; }
+
+  .results-table tbody tr:hover {
+    background: rgba(255,255,255,0.03);
+  }
+
+  /* rank 1 row highlight */
+  .results-table tbody tr.row-top {
+    background: rgba(200,241,53,0.04);
+  }
+
+  .results-table tbody tr.row-top:hover {
+    background: rgba(200,241,53,0.07);
+  }
+
+  .results-table tbody td {
+    padding: 14px 20px;
+    font-size: 0.84rem;
+    color: rgba(255,255,255,0.75);
+    white-space: nowrap;
+  }
+
+  .results-table tbody td.r { text-align: right; }
+
+  /* rank cell */
+  .rank-cell {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 1rem;
+    color: rgba(255,255,255,0.2);
+    font-weight: 400;
+    min-width: 36px;
+  }
+
+  .row-top .rank-cell {
+    color: var(--lime);
+  }
+
+  /* card name cell */
+  .name-cell {
+    font-family: 'Geist', sans-serif;
+    font-weight: 500;
+    font-size: 0.86rem;
+    color: #fff;
+    letter-spacing: -0.01em;
+  }
+
+  .row-top .name-cell { color: #fff; }
+
+  /* net value cell */
+  .val-cell {
+    font-family: 'Geist', sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #fff;
+    letter-spacing: -0.015em;
+  }
+
+  .row-top .val-cell { color: var(--lime); }
+
+  /* category pill */
+  .cat-pill {
+    display: inline-block;
+    font-size: 0.62rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: capitalize;
+    padding: 3px 9px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 100px;
+    color: rgba(255,255,255,0.5);
+  }
+
+  .row-top .cat-pill {
+    background: rgba(200,241,53,0.08);
+    border-color: rgba(200,241,53,0.18);
+    color: rgba(200,241,53,0.8);
+  }
+
+  /* fee waived badge inline */
+  .waived-badge {
+    display: inline-block;
+    font-size: 0.58rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    background: rgba(200,241,53,0.1);
+    border: 1px solid rgba(200,241,53,0.2);
+    border-radius: 4px;
+    color: var(--lime);
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+
+  /* ─── SCROLL HINT ─────────────────────────────── */
+  .table-scroll-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* thin custom scrollbar */
+  .table-scroll-wrap::-webkit-scrollbar { height: 4px; }
+  .table-scroll-wrap::-webkit-scrollbar-track { background: transparent; }
+  .table-scroll-wrap::-webkit-scrollbar-thumb {
+    background: rgba(255,255,255,0.1);
+    border-radius: 2px;
+  }
+
+  /* ─── EMPTY STATE ─────────────────────────────── */
+  .empty-state {
+    padding: 72px 36px;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.88rem;
+    font-weight: 300;
+  }
+
+  .empty-state strong {
+    display: block;
+    font-family: 'Geist', sans-serif;
+    font-weight: 600;
+    font-size: 1rem;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 6px;
+    letter-spacing: -0.01em;
+  }
+
+  /* ─── RESPONSIVE ──────────────────────────────── */
+  @media (max-width: 700px) {
+    .results-page { padding: 96px 4% 60px; }
+    .top-card { padding: 24px 20px; }
+    .top-card-inner { grid-template-columns: 1fr; gap: 20px; }
+    .top-card-value { text-align: left; }
+    .top-stat { padding: 0 14px; }
+    .table-header { padding: 16px 18px; }
+    .results-table thead th,
+    .results-table tbody td { padding: 12px 14px; }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="results-page">
+  <div class="results-inner">
+
+    <!-- Page header -->
+    <div class="results-header" data-fade>
+      <div class="results-header-left">
+        <p class="page-eyebrow">Analysis complete</p>
+        <h1 class="page-title">Your card <span class="serif">rankings</span></h1>
+        <p class="results-meta">Ranked by net annual value based on your spending profile</p>
+      </div>
+      <a href="{% url 'card_input' %}" class="rerun-btn">
+        <svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.96 7.96 0 0 0 12 4a8 8 0 1 0 8 8h-2a6 6 0 1 1-1.76-4.24l-2.99 2.99H20V4l-2.35 2.35z"/></svg>
+        Adjust inputs
+      </a>
+    </div>
+
+    {% if top_card %}
+    <!-- Top recommendation -->
+    <div class="top-card" data-fade data-delay="1">
+      <div class="top-card-inner">
+        <div class="top-card-left">
+          <div class="top-card-eyebrow">
+            <span class="top-card-eyebrow-dot"></span>
+            Top recommendation
+          </div>
+          <div class="top-card-name">
+            {{ top_card.name }}
+            {% if top_card.fee_waived %}
+            <span class="waived-badge">Fee waived</span>
+            {% endif %}
+          </div>
+          <p class="top-card-sub">
+            Best for <strong>{{ top_card.top_category }}</strong> spending
+          </p>
+          <div class="top-card-tags">
+            <span class="tag tag-lime">Highest net value</span>
+            <span class="tag tag-muted">{{ top_card.top_category }}</span>
+          </div>
+        </div>
+        <div class="top-card-value">
+          <div class="top-card-val-num">&#8377;{{ top_card.net_value }}</div>
+          <div class="top-card-val-label">Net annual value</div>
+        </div>
+      </div>
+
+      <!-- Mini stats row -->
+      <div class="top-card-stats">
+        <div class="top-stat">
+          <div class="top-stat-val">&#8377;{{ top_card.total_rewards }}</div>
+          <div class="top-stat-label">Total rewards</div>
+        </div>
+        <div class="top-stat">
+          <div class="top-stat-val">&#8377;{{ top_card.lounge_value }}</div>
+          <div class="top-stat-label">Lounge value</div>
+        </div>
+        <div class="top-stat">
+          <div class="top-stat-val">&#8377;{{ top_card.effective_fee }}</div>
+          <div class="top-stat-label">Effective fee</div>
+        </div>
+        <div class="top-stat">
+          <div class="top-stat-val">&#8377;{{ top_card.forex_cost }}</div>
+          <div class="top-stat-label">Forex cost</div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Full rankings table -->
+    <div class="table-card" data-fade data-delay="2">
+      <div class="table-header">
+        <span class="table-title">All cards ranked</span>
+        <span class="table-count">{{ results|length }} card{{ results|length|pluralize }} evaluated</span>
+      </div>
+
+      {% if results %}
+      <div class="table-scroll-wrap">
+        <table class="results-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Card</th>
+              <th class="r">Net value</th>
+              <th class="r">Rewards</th>
+              <th class="r">Lounge</th>
+              <th class="r">Forex cost</th>
+              <th class="r">Fee</th>
+              <th>Best for</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in results %}
+            <tr class="{% if forloop.first %}row-top{% endif %}">
+              <td class="rank-cell">{{ r.rank }}</td>
+              <td class="name-cell">
+                {{ r.name }}
+                {% if r.fee_waived %}<span class="waived-badge">Waived</span>{% endif %}
+              </td>
+              <td class="val-cell r">&#8377;{{ r.net_value }}</td>
+              <td class="r">&#8377;{{ r.total_rewards }}</td>
+              <td class="r">&#8377;{{ r.lounge_value }}</td>
+              <td class="r">&#8377;{{ r.forex_cost }}</td>
+              <td class="r">&#8377;{{ r.effective_fee }}</td>
+              <td><span class="cat-pill">{{ r.top_category }}</span></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="empty-state">
+        <strong>No results found</strong>
+        Try adjusting your spending inputs and running the analysis again.
+      </div>
+      {% endif %}
+
+    </div>
+
+  </div>
+</div>
+{% endblock %}

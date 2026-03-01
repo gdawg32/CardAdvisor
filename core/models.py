@@ -12,6 +12,11 @@ class CreditCard(models.Model):
 
     lounge_visits_per_year = models.PositiveIntegerField(default=0)
 
+    supports_forex = models.BooleanField(
+    default=True,
+    help_text="Whether the card supports international transactions"
+    )
+
     forex_markup_percent = models.FloatField(
         help_text="Forex markup percentage", default=0.0
     )
@@ -31,6 +36,12 @@ class RewardCategory(models.Model):
         ("other", "Other"),
     ]
 
+    CAP_TYPE_CHOICES = [
+        ("none", "No Cap"),
+        ("spend", "Spend Cap"),
+        ("cashback", "Cashback Cap"),
+    ]
+
     card = models.ForeignKey(
         CreditCard,
         on_delete=models.CASCADE,
@@ -40,13 +51,19 @@ class RewardCategory(models.Model):
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES)
 
     reward_rate = models.FloatField(
-        help_text="Cashback or value rate (e.g., 0.05 for 5%)"
+        help_text="Cashback rate (e.g., 0.05 for 5%)"
     )
 
-    monthly_cap = models.PositiveIntegerField(
+    cap_type = models.CharField(
+        max_length=10,
+        choices=CAP_TYPE_CHOICES,
+        default="none"
+    )
+
+    monthly_cap_amount = models.PositiveIntegerField(
         null=True,
         blank=True,
-        help_text="Maximum spend eligible for rewards per month",
+        help_text="Cap value: spend or cashback depending on cap_type"
     )
 
     def __str__(self):
