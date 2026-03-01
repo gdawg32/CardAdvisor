@@ -194,7 +194,7 @@ This allows the UI to explain *why* a card was recommended.
 
 ## AI Usage in Development
 
-AI tools (ChatGPT) were used in a limited and transparent manner for:
+AI tools (ChatGPT) were used for:
 
 - Exploring alternative decision engine structures
 - Introducing normalization and composite scoring utilities
@@ -204,3 +204,7 @@ AI tools (ChatGPT) were used in a limited and transparent manner for:
 All architectural decisions, domain modeling, and business logic validation were implemented manually.
 
 AI was also used to format Markdown documentation into a consistent and readable structure.
+
+## Deployment
+
+The application was deployed on PythonAnywhere for live testing and demonstration: https://cardadvisor.pythonanywhere.com
